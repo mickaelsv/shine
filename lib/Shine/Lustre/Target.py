@@ -354,7 +354,11 @@ class Target(Component, Disk):
         if len(mntdev_path) == 0:
             mntdev_path = glob('/proc/fs/lustre/osd-*/%s/mntdev' % self.label)
 
-        recov_path = glob('/proc/fs/lustre/*/%s/recovery_status' % self.label)
+        # Since 2.17.0, recovery_status has been moved to debugfs
+        recov_path = (
+            glob('/sys/kernel/debug/lustre/*/%s/recovery_status' % self.label) or
+            glob('/proc/fs/lustre/*/%s/recovery_status' % self.label)
+        )
         assert len(recov_path) <= 1
 
         # check for label presence in /proc : is this lustre target started?
